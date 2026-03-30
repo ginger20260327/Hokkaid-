@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>北海道冬紀行 | 旅遊助手</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 React 核心 -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- 引入 Babel 用於瀏覽器解析 JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- 引入 Lucide 圖標 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        /* 隱藏滾動條 */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+        // 這裡我們需要手動定義 Lucide 圖標組件，因為是 CDN 版
+        const Icon = ({ name, size = 20, ...props }) => {
+            const [svg, setSvg] = useState('');
+            useEffect(() => {
+                if (window.lucide) {
+                    const iconSvg = lucide.createIcons();
+                }
+            }, []);
+            return <i data-lucide={name} style={{width: size, height: size}} {...props}></i>;
+        };
+
+        // 這裡放入之前的 App 代碼 (簡化版本以確保執行)
+        const HOKKAIDO_DATA = [
+            { day: 1, date: "2/6 (二)", location: "新千歲 / 旭川", items: [
+                { time: "11:05", title: "抵達新千歲 (IT234)", desc: "租車、前往旭川", type: "transport", nav: "https://www.google.com/maps/search/?api=1&query=New+Chitose+Airport" },
+                { time: "18:00", title: "大黑屋 成吉思汗", desc: "必吃羊肉", type: "restaurant", nav: "https://www.google.com/maps/search/?api=1&query=Daikokuya+Asahikawa" }
+            ]},
+            { day: 2, date: "2/7 (三)", location: "層雲峽 / 網走", items: [
+                { time: "09:00", title: "層雲峽冰瀑", desc: "壯麗峽谷", type: "spot", nav: "https://www.google.com/maps/search/?api=1&query=Sounkyo" }
+            ]}
+        ];
+
+        const App = () => {
+            const [tab, setTab] = useState('itinerary');
+
+            useEffect(() => {
+                lucide.createIcons();
+            }, [tab]);
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-24 shadow-xl bg-white">
+                    <header className="sticky top-0 bg-white/80 backdrop-blur-md p-4 border-b flex justify-between items-center z-50">
+                        <h1 className="font-bold text-xl">北海道冬紀行</h1>
+                        <i data-lucide="snowflake" className="text-blue-400"></i>
+                    </header>
+
+                    <main className="p-4">
+                        {tab === 'itinerary' && HOKKAIDO_DATA.map(day => (
+                            <div key={day.day} className="mb-8">
+                                <h2 className="text-2xl font-black text-slate-200 italic mb-4">DAY {day.day} <span className="text-sm text-slate-500 not-italic">{day.date}</span></h2>
+                                {day.items.map((item, i) => (
+                                    <div key={i} className="bg-white border rounded-2xl p-4 mb-4 shadow-sm">
+                                        <div className="flex justify-between mb-2">
+                                            <span className="text-xs font-mono text-slate-400">{item.time}</span>
+                                            <i data-lucide={item.type === 'restaurant' ? 'utensils' : 'map-pin'} className="w-4 h-4 text-slate-400"></i>
+                                        </div>
+                                        <h3 className="font-bold mb-1">{item.title}</h3>
+                                        <p className="text-xs text-slate-500 mb-3">{item.desc}</p>
+                                        <a href={item.nav} className="block text-center bg-slate-900 text-white py-2 rounded-xl text-sm font-bold">導航</a>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </main>
+
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white border shadow-2xl rounded-full h-16 flex items-center justify-around z-50">
+                        <button onClick={() => setTab('itinerary')} className="flex flex-col items-center">
+                            <i data-lucide="calendar" className={tab === 'itinerary' ? 'text-black' : 'text-slate-300'}></i>
+                            <span className="text-[10px]">行程</span>
+                        </button>
+                        <button onClick={() => setTab('wallet')} className="flex flex-col items-center">
+                            <i data-lucide="trending-up" className={tab === 'wallet' ? 'text-black' : 'text-slate-300'}></i>
+                            <span className="text-[10px]">記帳</span>
+                        </button>
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
